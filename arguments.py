@@ -190,15 +190,15 @@ def get_args():
             total_num_scenes = args.total_num_scenes
             gpu_memory = 1000
             for i in range(num_gpus):
-                gpu_memory = min(gpu_memory,
-                    torch.cuda.get_device_properties(i).total_memory \
-                            /1024/1024/1024)
-                if i==0:
-                    assert torch.cuda.get_device_properties(i).total_memory \
-                            /1024/1024/1024 > 10.0, "Insufficient GPU memory"
+                gpu_memory = torch.cuda.get_device_properties(i).total_memory /1024/1024/1024
+                    
+                # if i==0:
+                #     print(torch.cuda.get_device_properties(i).total_memory/1024/1024/1024)
+                #     assert torch.cuda.get_device_properties(i).total_memory \
+                #             /1024/1024/1024 > 1.0, "Insufficient GPU memory"
 
             num_processes_per_gpu = int(gpu_memory/1.4)
-            num_processes_on_first_gpu = int((gpu_memory - 10.0)/1.4)
+            num_processes_on_first_gpu = int((gpu_memory - 5.0)/1.4)
 
             if num_gpus == 1:
                 args.num_processes_on_first_gpu = num_processes_on_first_gpu

@@ -76,11 +76,10 @@ class Neural_SLAM_Module(nn.Module):
 
         # Visual Encoding
         resnet = models.resnet18(pretrained=args.pretrained_resnet)
+        # resnet = models.efficientnet_b6(pretrained=args.pretrained_resnet)
+        # resnet = models.vit(pretrained=args.pretrained_resnet)
         self.resnet_l5 = nn.Sequential(*list(resnet.children())[0:8])
-        self.conv = nn.Sequential(*filter(bool, [
-            nn.Conv2d(512, 64, (1, 1), stride=(1, 1)),
-            nn.ReLU()
-        ]))
+        self.conv = nn.Sequential(*filter(bool, [nn.Conv2d(512, 64, (1, 1), stride=(1, 1)), nn.ReLU()]))
 
         # convolution output size
         input_test = torch.randn(1,
@@ -328,6 +327,8 @@ class Local_IL_Policy(NNBase):
             nn.Conv2d(512, 64, (1, 1), stride=(1, 1)),
             nn.ReLU()
         ]))
+
+        print(input_shape)
 
         # convolution output size
         input_test = torch.randn(1, 3, input_shape[1], input_shape[2])

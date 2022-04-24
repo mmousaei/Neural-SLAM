@@ -26,7 +26,8 @@ from env.utils.map_builder import MapBuilder
 from env.utils.fmm_planner import FMMPlanner
 
 from env.habitat.utils.noisy_actions import CustomActionSpaceConfiguration
-import env.habitat.utils.pose as pu
+# import env.habitat.utils.pose as pu
+from env.habitat.utils import pose as pu
 import env.habitat.utils.visualizations as vu
 from env.habitat.utils.supervision import HabitatMaps
 
@@ -356,7 +357,7 @@ class Exploration_Env(habitat.RLEnv):
         params['agent_min_z'] = 25
         params['agent_max_z'] = 150
         params['agent_height'] = self.args.camera_height * 100
-        params['agent_view_angle'] = 0
+        params['agent_view_angle'] = 1
         params['du_scale'] = self.args.du_scale
         params['vision_range'] = self.args.vision_range
         params['visualize'] = self.args.visualize

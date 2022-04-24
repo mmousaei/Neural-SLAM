@@ -17,17 +17,20 @@ from utils.storage import GlobalRolloutStorage, FIFOMemory
 from utils.optimization import get_optimizer
 from model import RL_Policy, Local_IL_Policy, Neural_SLAM_Module
 
+
 import algo
 
 import sys
 import matplotlib
+# import matplotlib.pyplot as plt
 
 if sys.platform == 'darwin':
     matplotlib.use("tkagg")
 import matplotlib.pyplot as plt
+matplotlib.use('TkAgg')
 
-# plt.ion()
-# fig, ax = plt.subplots(1,4, figsize=(10, 2.5), facecolor="whitesmoke")
+plt.ion()
+fig, ax = plt.subplots(1,4, figsize=(10, 2.5), facecolor="whitesmoke")
 
 
 args = get_args()
@@ -406,6 +409,7 @@ def main():
                              local_map[:, 1, :, :], local_pose, build_maps=True)
 
             locs = local_pose.cpu().numpy()
+            print("locs  = ", locs)
             planner_pose_inputs[:, :3] = locs + origins
             local_map[:, 2, :, :].fill_(0.)  # Resetting current location channel
             for e in range(num_scenes):
@@ -681,7 +685,11 @@ def main():
                             np.mean(exp_costs),
                             np.mean(pose_costs))
                     ])
-
+                #     plt.plot(costs)
+                #     plt.plot(exp_costs)
+                #     plt.plot(pose_costs)
+                #     plt.pause(0.05)
+                # plt.show()
                 print(log)
                 logging.info(log)
             # ------------------------------------------------------------------
