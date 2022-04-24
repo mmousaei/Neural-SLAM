@@ -75,11 +75,11 @@ class Neural_SLAM_Module(nn.Module):
         self.use_pe = args.use_pose_estimation
 
         # Visual Encoding
-        resnet = models.resnet18(pretrained=args.pretrained_resnet)
+        resnet = models.efficientnet_b1(pretrained=args.pretrained_resnet)
         # resnet = models.efficientnet_b6(pretrained=args.pretrained_resnet)
         # resnet = models.vit(pretrained=args.pretrained_resnet)
-        self.resnet_l5 = nn.Sequential(*list(resnet.children())[0:8])
-        self.conv = nn.Sequential(*filter(bool, [nn.Conv2d(512, 64, (1, 1), stride=(1, 1)), nn.ReLU()]))
+        self.resnet_l5 = nn.Sequential(*list(resnet.children())[:-2])
+        self.conv = nn.Sequential(*filter(bool, [nn.Conv2d(1280, 64, (1, 1), stride=(1, 1)), nn.ReLU()]))
 
         # convolution output size
         input_test = torch.randn(1,
