@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 from torch.nn import functional as F
+from torch.autograd import Variable
 import torchvision.models as models
 import numpy as np
 
@@ -56,6 +57,7 @@ class Global_Policy(NNBase):
         return self.critic_linear(x).squeeze(-1), x, rnn_hxs
 
 
+
 # Neural SLAM Module code
 class Neural_SLAM_Module(nn.Module):
     """
@@ -73,6 +75,8 @@ class Neural_SLAM_Module(nn.Module):
         self.vision_range = args.vision_range
         self.dropout = 0.5
         self.use_pe = args.use_pose_estimation
+        self.hidden_feats = 1024 # no idea how this affects anything and neither do most peopel
+        self.num_layers = 2
 
         # Visual Encoding
         resnet = models.efficientnet_b1(pretrained=args.pretrained_resnet)
@@ -124,6 +128,10 @@ class Neural_SLAM_Module(nn.Module):
         self.pose_conv_output_size = pose_conv_output.view(-1).size(0)
 
         # projection layer
+        self.lstm_hidden_state = torch.zeros(self.pose_conv_output_size, self.hidden_feats, dtype=torch.float32)
+        self.lstm_cell_state = torch.zeros(self.pose_conv_output_size, self.hidden_feats, dtype=torch.float32)
+        self.lstm = nn.LSTMCell(self.pose_conv_output_size, self.hidden_feats)
+        
         self.pose_proj1 = nn.Linear(self.pose_conv_output_size, 1024)
         self.pose_proj2_x = nn.Linear(1024, 128)
         self.pose_proj2_y = nn.Linear(1024, 128)
@@ -223,8 +231,9 @@ class Neural_SLAM_Module(nn.Module):
         pose_conv_output = self.pose_conv(pose_est_input)
         pose_conv_output = pose_conv_output.view(-1,
                                                  self.pose_conv_output_size)
-
-        proj1 = nn.ReLU()(self.pose_proj1(pose_conv_output))
+        # h_s, c_s = self.lstm(pose_conv_output, (self.lstm_hidden_state, self.lstm_cell_state))
+        # proj1 = nn.ReLU()(self.pose_proj1(pose_conv_output))
+        proj1, cell_states = self.lstm(pose_conv_output)
 
         if self.dropout > 0:
             proj1 = self.pose_dropout1(proj1)
