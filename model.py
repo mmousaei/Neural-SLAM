@@ -75,7 +75,7 @@ class Neural_SLAM_Module(nn.Module):
         self.vision_range = args.vision_range
         self.dropout = 0.5
         self.use_pe = args.use_pose_estimation
-        self.hidden_feats = 1024 # no idea how this affects anything and neither do most peopel
+        self.hidden_feats = 128 # no idea how this affects anything and neither do most peopel
         self.num_layers = 2
 
         # Visual Encoding
@@ -133,9 +133,9 @@ class Neural_SLAM_Module(nn.Module):
         self.lstm = nn.LSTMCell(self.pose_conv_output_size, self.hidden_feats)
         
         self.pose_proj1 = nn.Linear(self.pose_conv_output_size, 1024)
-        self.pose_proj2_x = nn.Linear(1024, 128)
-        self.pose_proj2_y = nn.Linear(1024, 128)
-        self.pose_proj2_o = nn.Linear(1024, 128)
+        self.pose_proj2_x = nn.Linear(self.hidden_feats, 128)
+        self.pose_proj2_y = nn.Linear(self.hidden_feats, 128)
+        self.pose_proj2_o = nn.Linear(self.hidden_feats, 128)
         self.pose_proj3_x = nn.Linear(128, 1)
         self.pose_proj3_y = nn.Linear(128, 1)
         self.pose_proj3_o = nn.Linear(128, 1)
