@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 from torch.nn import functional as F
 import torchvision.models as models
+import time
 import numpy as np
 
 from utils.distributions import Categorical, DiagGaussian
@@ -218,6 +219,7 @@ class Neural_SLAM_Module(nn.Module):
             pred_last_st = rotated
 
         # Pose estimator
+        tic = time.perf_counter_ns()
         pose_est_input = torch.cat((pred.detach(), pred_last_st.detach()),
                                    dim=1)
         pose_conv_output = self.pose_conv(pose_est_input)
@@ -241,6 +243,10 @@ class Neural_SLAM_Module(nn.Module):
         pose_pred = torch.cat((pred_dx, pred_dy, pred_do), dim=1)
         if self.use_pe == 0:
             pose_pred = pose_pred * self.use_pe
+        toc = time.perf_counter_ns()
+        with open("times.log", "a") as f:
+            f.write(str(toc - tic) + "\n")
+        
 
         if build_maps:
             # Aggregate egocentric map prediction in the geocentric map
@@ -328,7 +334,7 @@ class Local_IL_Policy(NNBase):
             nn.ReLU()
         ]))
 
-        print(input_shape)
+        # print(input_shape)
 
         # convolution output size
         input_test = torch.randn(1, 3, input_shape[1], input_shape[2])
